@@ -1,0 +1,2 @@
+# pureLrc
+Lyric
