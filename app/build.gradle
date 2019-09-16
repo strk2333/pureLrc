@@ -1,0 +1,114 @@
+buildscript {
+//    repositories {
+//        maven { url 'https://maven.fabric.io/public' }
+//    }
+//
+//    dependencies {
+//        classpath 'io.fabric.tools:gradle:1.+'
+//    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+apply plugin: 'kotlin-android-extensions'
+
+
+apply plugin: 'realm-android'
+
+
+def STRING = 'String'
+def BUILD_TIME = 'BUILD_TIME'
+
+//apply plugin: 'io.fabric'
+//
+//repositories {
+//    maven { url 'https://maven.fabric.io/public' }
+//}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion "28.0.3" // "25.0.3"
+
+    defaultConfig {
+        applicationId "com.strk2333.purelrc"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField STRING, BUILD_TIME, "\"${rootProject.ext.buildTime}\""
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            zipAlignEnabled true
+            shrinkResources true
+            debuggable false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    //supportLib
+    implementation rootProject.ext.supportLib
+    implementation rootProject.ext.supportLibAppCompat
+    implementation rootProject.ext.supportLibDesign
+    implementation rootProject.ext.supportLibRecyclerview
+    implementation rootProject.ext.supportLibCardview
+
+    //timber
+    implementation rootProject.ext.timber
+
+    //crashlytics
+//    implementation (rootProject.ext.crashlytics){
+//        transitive = true;
+//    }
+
+    //di
+    implementation rootProject.ext.dagger
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
+    kapt rootProject.ext.daggerApt
+    //implementation rootProject.ext.daggerSupport
+    //annotationProcessor rootProject.ext.daggerAnnotation
+
+    //rx
+    implementation rootProject.ext.rxJava
+    implementation rootProject.ext.rxAndroid
+    implementation rootProject.ext.rxKotlin
+
+    //net
+    implementation rootProject.ext.retrofit
+    implementation rootProject.ext.okHttp
+    implementation rootProject.ext.gson
+    implementation rootProject.ext.rxJavaAdapter
+    implementation rootProject.ext.gsonConverter
+
+    //picasso
+    implementation rootProject.ext.picasso
+
+    //test
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.google.code.findbugs'
+    })
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version" // jre
+
+    // custom
+    implementation 'com.rengwuxian.materialedittext:library:2.1.4'
+}
+repositories {
+    mavenCentral()
+}
