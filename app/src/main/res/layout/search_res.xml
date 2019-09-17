@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout_search_res"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp">
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/search_res_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/boo"/>
-    <TextView
+        app:met_clearButton="true"
+        android:hint="@string/search_hint"
+        android:imeOptions="actionSearch"
+        android:singleLine="true" />
+    <com.jcodecraeer.xrecyclerview.XRecyclerView
+        android:id="@+id/search_res_swipe"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent">
+    </com.jcodecraeer.xrecyclerview.XRecyclerView>
 
 </LinearLayout>

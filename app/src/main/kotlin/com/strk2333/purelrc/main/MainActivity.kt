@@ -5,8 +5,9 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.strk2333.purelrc.R
 import com.strk2333.purelrc.Application
+import com.strk2333.purelrc.utils.toast
 import com.strk2333.purelrc.view.SearchActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.acitvity_main.*
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), IMainView {
@@ -16,12 +17,16 @@ class MainActivity : AppCompatActivity(), IMainView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.acitvity_main)
         DaggerMainComponent.builder().applicationComponent(Application.component).mainModule(MainModule(this)).build().inject(this)
 
         mainSearch.setOnClickListener {
             val i = Intent(this, SearchActivity::class.java)
             startActivity(i)
+        }
+
+        mainFab.setOnClickListener{
+            toast(this, "不要瞎点")
         }
     }
 }
