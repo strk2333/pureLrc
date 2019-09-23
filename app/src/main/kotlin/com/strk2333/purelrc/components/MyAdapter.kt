@@ -9,13 +9,18 @@ import com.strk2333.purelrc.R
 
 import java.util.ArrayList
 
-class MyAdapter(datas: ArrayList<Map<String, String>>) : RecyclerView.Adapter<MyAdapter.ViewHolder>() {
+class MyAdapter(datas: ArrayList<MutableMap<String, String>>) : RecyclerView.Adapter<MyAdapter.ViewHolder>() {
 
-    var datas: ArrayList<Map<String, String>>? = null
+    var datas: ArrayList<MutableMap<String, String>>? = null
     private var clickCallBack: ItemClickCallBack? = null
+    private var clickFavCallBack: ItemClickCallBack? = null
 
     fun setClickCallBack(clickCallBack: ItemClickCallBack) {
         this.clickCallBack = clickCallBack
+    }
+
+    fun setClickFavCallBack(clickFavCallBack: ItemClickCallBack) {
+        this.clickFavCallBack = clickFavCallBack
     }
 
     interface ItemClickCallBack {
@@ -35,9 +40,15 @@ class MyAdapter(datas: ArrayList<Map<String, String>>) : RecyclerView.Adapter<My
     //将数据与界面进行绑定的操作
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         viewHolder.mBtn.text = datas!!.get(position).get("name")
+        viewHolder.mFavBtn.text = datas!!.get(position).get("fav")
         viewHolder.mBtn.setOnClickListener {
             if (clickCallBack != null) {
                 clickCallBack!!.onItemClick(position)
+            }
+        }
+        viewHolder.mFavBtn.setOnClickListener {
+            if (clickFavCallBack != null) {
+                clickFavCallBack!!.onItemClick(position)
             }
         }
     }
@@ -53,11 +64,11 @@ class MyAdapter(datas: ArrayList<Map<String, String>>) : RecyclerView.Adapter<My
 
     //自定义的ViewHolder，持有每个Item的的所有界面元素
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-//        var mTextView: TextView
         var mBtn: Button
+        var mFavBtn: Button
         init {
-//            mTextView = view.findViewById(R.id.search_res_item_title) as TextView
             mBtn = view.findViewById(R.id.search_res_item_btn) as Button
+            mFavBtn = view.findViewById(R.id.search_res_item_favorite) as Button
         }
     }
 }

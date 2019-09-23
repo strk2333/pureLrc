@@ -7,8 +7,13 @@
     <dimen name="text_big1">17sp</dimen>
     <dimen name="text_big2">19sp</dimen>
     <dimen name="text_big3">21sp</dimen>
+    <dimen name="text_big4">23sp</dimen>
+    <dimen name="text_big5">25sp</dimen>
     <dimen name="text_small1">13sp</dimen>
     <dimen name="text_small2">11sp</dimen>
     <dimen name="text_small3">9sp</dimen>
     <dimen name="search_item_padding">15dp</dimen>
+    <dimen name="minHeight">56dp</dimen>
+    <dimen name="recordOffset">60dp</dimen>
+    <dimen name="homeOffset">20dp</dimen>
 </resources>

@@ -10,4 +10,6 @@
     <string name="search_hint">Search</string>
     <string name="search_advice">搜索建议</string>
     <string name="search_history">搜索历史</string>
+    <string name="search_record">搜索记录</string>
+    <string name="search_favorite">收藏</string>
 </resources>

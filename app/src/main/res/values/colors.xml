@@ -2,6 +2,10 @@
 <resources>
 <!--    <color name="colorPrimary">#3F51B5</color>-->
     <color name="colorPrimary">#812990</color>
+
+    <color name="colorStart">#812990</color>
+    <color name="colorCenter">#EBE3EC</color>
+    <color name="colorEnd">#FAFAFA</color>
 <!--    <color name="colorPrimaryDark">#303F9F</color>-->
     <color name="colorPrimaryDark">#812990</color>
 <!--    <color name="colorAccent">#FF4081</color>-->

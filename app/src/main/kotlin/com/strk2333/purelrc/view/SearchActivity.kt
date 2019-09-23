@@ -18,7 +18,11 @@ import android.widget.TextView
 import com.strk2333.purelrc.*
 import com.strk2333.purelrc.di.module.NetModule
 import com.strk2333.purelrc.utils.*
+import com.strk2333.purelrc.utils.LocalShared.clearHistory
 import com.strk2333.purelrc.utils.LocalShared.getHistory
+import com.strk2333.purelrc.utils.LocalShared.historyMax
+import com.strk2333.purelrc.utils.LocalShared.saveHistory
+import com.strk2333.purelrc.utils.LocalShared.suggestMax
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -35,11 +39,8 @@ class SearchActivity : AppCompatActivity() {
     private var pref: SharedPreferences? = null
     private val client = NetModule().provideOkHttpClient()
     private var searchString = ""
-    private val localShared = LocalShared
     private val historyList = ArrayList<View>()
     private val suggestList = ArrayList<View>()
-    private val historyMax = 10
-    private val suggestMax = 4 // 4 is max in netease music
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,7 +109,7 @@ class SearchActivity : AppCompatActivity() {
         })
 
         search_history_clear.setOnClickListener {
-            localShared.clearHistory(pref!!)
+            clearHistory(pref!!)
             setHistoryView()
         }
     }
@@ -117,7 +118,7 @@ class SearchActivity : AppCompatActivity() {
         if (v == "")
             return
 
-        localShared.saveHistory(pref!!, v)
+        saveHistory(pref!!, v)
 
         val intent = Intent(this, SearchResultActivity::class.java)
         intent.putExtra("searchWords", v)

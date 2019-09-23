@@ -15,18 +15,23 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import com.roger.catloadinglibrary.CatLoadingView
 import com.strk2333.purelrc.*
 import com.strk2333.purelrc.components.MyAdapter
 import com.strk2333.purelrc.di.module.NetModule
+import com.strk2333.purelrc.utils.*
+import com.strk2333.purelrc.utils.LocalShared.cancelFavorite
+import com.strk2333.purelrc.utils.LocalShared.getFavorite
+import com.strk2333.purelrc.utils.LocalShared.saveFavorite
 import com.strk2333.purelrc.utils.LocalShared.saveHistory
-import com.strk2333.purelrc.utils.searchIntentResult
-import com.strk2333.purelrc.utils.sharedSearch
-import com.strk2333.purelrc.utils.toast
+import com.strk2333.purelrc.utils.LocalShared.saveRecord
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.search.*
 import okhttp3.Request
 import org.json.JSONObject
 import java.lang.Exception
@@ -37,7 +42,8 @@ class SearchResultActivity : AppCompatActivity() {
     private var searchString = ""
     private var pref: SharedPreferences? = null
     private var mAdapter: MyAdapter? = null
-    private var listData = ArrayList<Map<String, String>>()
+    private var listData = ArrayList<MutableMap<String, String>>()
+    private val mView = CatLoadingView();
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,31 +51,36 @@ class SearchResultActivity : AppCompatActivity() {
         initData()
         initListener()
         searchString = intent.getStringExtra("searchWords").toString()
+
         search_res_view.text = SpannableStringBuilder(searchString)
         search_res_view.setSelection(searchString.length)
+
         fetch(searchString)
-//        val rxBus = RxBus()
-//        rxBus.toObservable()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(Consumer {
-//                    val req = Request.Builder()
-//                            .url("http://http://106.54.25.147:3000/search?keywords=%E6%B5%B7%E9%98%94%E5%A4%A9%E7%A9%BA")
-//                            .build()
-//                    val res = NetModule().provideOkHttpClient().newCall(req).execute()
-//                    resData = res.body().toString()
-//                    search_res_test.text = resData
-//
-//                })
     }
 
     private fun initData() {
+        mView.setCanceledOnTouchOutside(false)
+        mView.setText("   加载中 请稍候")
         pref = getSharedPreferences(sharedSearch, Context.MODE_PRIVATE)
         mAdapter = MyAdapter(listData)
         mAdapter!!.setClickCallBack(object : MyAdapter.ItemClickCallBack {
             override fun onItemClick(pos: Int) {
                 searchLrc(listData[pos]["id"] ?: error("id not found"),
                         listData[pos]["name"] ?: error("id not found"))
+            }
+        })
+        mAdapter!!.setClickFavCallBack(object : MyAdapter.ItemClickCallBack {
+            override fun onItemClick(pos: Int) {
+                val fav = listData[pos]["fav"]
+                val text = listData[pos]["name"] + placeHolder2 + listData[pos]["id"]
+                if (fav == favText) {
+                    favorite(text)
+                    listData[pos]["fav"] = cancelFavText
+                } else {
+                    cancelFavorite(text)
+                    listData[pos]["fav"] = favText
+                }
+                mAdapter?.notifyDataSetChanged()
             }
         })
         val layoutManager = LinearLayoutManager(this)
@@ -112,6 +123,8 @@ class SearchResultActivity : AppCompatActivity() {
     @SuppressLint("CheckResult")
     private fun fetch(v: String) {
         //使用RxJava处理
+        mView.show(supportFragmentManager, "")
+
         Observable.create(ObservableOnSubscribe<String> { e ->
             //使用okhttp3访问网络
             val builder = Request.Builder()
@@ -136,17 +149,33 @@ class SearchResultActivity : AppCompatActivity() {
                         val json = JSONObject(response)
                         val obj = json.getJSONObject("result").getJSONArray("songs")
                         listData.clear()
+                        val fav = getFavorite(pref!!)
+                        var favArr: List<String>? = null
+                        if (!fav.isNullOrEmpty()) {
+                            favArr = fav.split(placeHolder).map {
+                                v ->
+                                val arr = v.split(placeHolder2)
+                                if (arr.size == 2) arr[1] else unreachableValue
+                            }
+                        }
+
                         for (i in 0 until obj.length()) {
                             val info = obj[i] as JSONObject
                             val map = mutableMapOf<String, String>()
                             map["name"] = info["name"].toString()
                             map["id"] = info["id"].toString()
+                            if (favArr != null) {
+                                map["fav"] = if (favArr.contains(info["id"].toString())) cancelFavText else favText
+                            } else {
+                                map["fav"] = favText
+                            }
                             listData.add(map)
                         }
-                        Log.i("res", listData.toString())
                         mAdapter?.notifyDataSetChanged()
+                        mView.dismiss()
                     } catch (e: Exception) {
-                        Log.e("Error", e.toString())
+                        e.printStackTrace()
+                        mView.dismiss()
                     }
                 }
     }
@@ -155,7 +184,17 @@ class SearchResultActivity : AppCompatActivity() {
         val intent = Intent(this, LrcActivity::class.java)
         intent.putExtra("id", id)
         intent.putExtra("name", name)
+        saveRecord(pref!!, name + placeHolder2 + id)
         startActivityForResult(intent, searchIntentResult)
+    }
+
+    // name ph2 id
+    private fun favorite(v: String) {
+        saveFavorite(pref!!, v)
+    }
+
+    private fun cancelFavorite(v: String) {
+        LocalShared.cancelFavorite(pref!!, v)
     }
 
     override fun onBackPressed() {
